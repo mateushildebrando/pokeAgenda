@@ -1,5 +1,13 @@
 from config import *
 
+@app.route('/')
+def home():
+    if session.get('id'):
+        return redirect(url_for('perfil'))
+    else:
+        return redirect(url_for('login'))
+
+
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
     if request.method == 'POST':
