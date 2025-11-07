@@ -4,7 +4,8 @@ CREATE TABLE treinador(
     email VARCHAR(100) NOT NULL,
     cpf VARCHAR(11) NOT NULL,
     foto VARCHAR(260),
-    cidade VARCHAR(30) NOT NULL
+    cidade VARCHAR(30) NOT NULL,
+    senha VARCHAR(87) NOT NULL
 );
 
 CREATE TABLE pokemon (
