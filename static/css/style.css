@@ -1,0 +1,72 @@
+/* Fundo e fonte */
+body {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    font-family: "Poppins", sans-serif;
+    margin: 0;
+    padding: 0;
+
+    /* Centralização total */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Card centralizado e elegante */
+.login-card {
+    width: 100%;
+    max-width: 800px;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+    animation: fadeInUp 0.5s ease;
+    padding: 2rem;
+}
+
+/* Ícone */
+.login-icon i {
+    background-color: #e3f2fd;
+    padding: 18px;
+    border-radius: 50%;
+}
+
+/* Input */
+.input-group-text {
+    border: none;
+    border-radius: 0.75rem 0 0 0.75rem;
+}
+
+input.form-control {
+    border-left: none;
+    border-radius: 0 0.75rem 0.75rem 0;
+}
+
+input.form-control:focus {
+    border-color: #2196f3;
+    box-shadow: 0 0 0 0.1rem rgba(33, 150, 243, 0.25);
+}
+
+/* Botão */
+.btn-primary {
+    background-color: #2196f3;
+    border: none;
+    border-radius: 0.75rem;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #1976d2;
+    transform: translateY(-1px);
+}
+
+/* Animação */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
