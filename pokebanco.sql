@@ -10,7 +10,7 @@ CREATE TABLE treinador(
 
 CREATE TABLE pokemon (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(40) NOT NULL,
+    nome VARCHAR(100) NOT NULL,
     numero_pokedex VARCHAR(5) NOT NULL,
     tipo VARCHAR(10) NOT NULL,
     imagem_url VARCHAR(260),
@@ -24,18 +24,18 @@ CREATE TABLE treinador_pokemon(
     treinador_id INT NOT NULL, 
     pokemon_id INT NOT NULL, 
     posicao VARCHAR(4) NOT NULL,
-    FOREIGN KEY (treinador_id) REFERENCES treinador(id)
+    FOREIGN KEY (treinador_id) REFERENCES treinador(id),
     FOREIGN KEY (pokemon_id) REFERENCES pokemon(id)
 );
 
 CREATE TABLE tipo (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(40) NOT NULL
-)
+);
 
 INSERT INTO pokemon (nome, numero_pokedex, tipo, imagem_url, altura, peso, habilidades) VALUES
 ('Bulbasaur', '001', 'Planta', 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png', 7, 6.9, 'Overgrow'),
-(2, 'Ivysaur', '002', 'Planta', 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png', 10, 13.0, 'Overgrow'),
+('Ivysaur', '002', 'Planta', 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png', 10, 13.0, 'Overgrow'),
 ('Venusaur', '003', 'Planta', 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png', 20, 100.0, 'Overgrow'),
 ('Charmander', '004', 'Fogo', 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png', 6, 8.5, 'Blaze'),
 ('Charmeleon', '005', 'Fogo', 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png', 11, 19.0, 'Blaze'),

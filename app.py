@@ -16,7 +16,7 @@ def cadastro():
         cpf = request.form['cpf']
         foto = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp'
         cidade = request.form['cidade']
-        senha_raw = request.form['senha']
+        senha_raw = request.form['senha_raw']
         senha = generate_password_hash(senha_raw)
 
         if not all([nome, email, cpf, cidade, senha_raw]):
@@ -72,6 +72,7 @@ def login():
             session['foto'] = treinador['foto']
             session['cidade'] = treinador['cidade']
 
+        if treinador:
             return redirect(url_for('perfil'))
                     
         else:
@@ -99,6 +100,34 @@ def logout():
 if __name__ == '__main__':
     app.run(debug=True)
 
-@app.route('perfil/editar')
-def editar_perfil():
-    pass
+@app.route('/perfil/editar/<int:id>', methods=['GET', 'POST'])
+def editar_pvp(id):
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+
+    if request.method == 'POST':
+        nome = request.form['nome']
+        email = request.form['email']
+        cpf = request.form['cpf']
+        cidade = request.form['cidade']
+
+        query = """
+            UPDATE treinador SET nome = %s, email = %s, cpf = %s, cidade = %s
+            WHERE id = %s
+        """
+        cursor.execute(query, (nome, email, cpf, cidade, id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        flash("Perfil atualizado com sucesso!", "sucesso")
+        return redirect(url_for('perfil'))
+
+    cursor.execute("SELECT * FROM treinador WHERE id = %s", (id,))
+    treinador = cursor.fetchone()
+    if not treinador:
+        flash("Treinador não encontrado.", "erro")
+        return redirect(url_for('perfil'))
+    
+    cursor.close()
+    conn.close()
+    return render_template('editar_perfil.html', treinador=treinador)
