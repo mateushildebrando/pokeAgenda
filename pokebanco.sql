@@ -23,7 +23,7 @@ CREATE TABLE treinador_pokemon(
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
     treinador_id INT NOT NULL, 
     pokemon_id INT NOT NULL, 
-    posicao VARCHAR(4) NOT NULL,
+    posicao VARCHAR(4) NOT NULL,    
     FOREIGN KEY (treinador_id) REFERENCES treinador(id),
     FOREIGN KEY (pokemon_id) REFERENCES pokemon(id)
 );
