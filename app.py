@@ -440,19 +440,22 @@ def trocar_pokemon_confirmar():
 
     box_pokemon_id = resultado["id"]
 
-    # pegar o id da relação treinador_pokemon correspondente ao Pokémon do box
+    # pegar o id da relação do Pokémon escolhido no box
     cursor.execute("""
-        SELECT id FROM treinador_pokemon 
-        WHERE pokemon_id=%s LIMIT 1
-    """, (box_pokemon_id,))
+        SELECT id 
+        FROM treinador_pokemon 
+        WHERE pokemon_id=%s AND treinador_id=%s AND posicao='box'
+        LIMIT 1
+    """, (box_pokemon_id, session["id"]))
     
     relacao_box = cursor.fetchone()
-
+    
     if not relacao_box:
         flash("Esse Pokémon não está no seu box.", "erro")
         return redirect(url_for("perfil"))
-
+    
     box_relacao_id = relacao_box["id"]
+
 
     # trocar posições
     cursor.execute("UPDATE treinador_pokemon SET posicao='box' WHERE id=%s", (time_id,))
