@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Resultados - PokeAgenda{% endblock %}
+
+{% block content %}
+<h2>Resultados da Busca</h2>
+
+{% if pokemons %}
+    <ul>
+    {% for p in pokemons %}
+        <li>
+            <img src="{{ p.imagem_url }}" width="80" alt="{{ p.nome }}">
+            <strong>{{ p.nome }}</strong> ({{ p.numero_pokedex }}) — {{ p.tipo }}<br>
+            Alt: {{ p.altura }} — Peso: {{ p.peso }} — {{ p.habilidades }}<br>
+
+            <form action="{{ url_for('adicionar_pokemon') }}" method="POST" style="display:inline;">
+                <input type="hidden" name="pokemon" value="{{ p.nome }}">
+                <button type="submit">Adicionar</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhum Pokémon encontrado.</p>
+{% endif %}
+
+<p><a href="{{ url_for('buscar_pokemon') }}">Voltar</a></p>
+{% endblock %}

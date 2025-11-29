@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}PokeAgenda{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <h1><a href="{{ url_for('home') }}">PokeAgenda</a></h1>
+        <nav>
+            <a href="{{ url_for('perfil') }}">Perfil</a> |
+            <a href="{{ url_for('buscar_pokemon') }}">Buscar Pokémons</a> |
+            <a href="{{ url_for('adicionar_pokemon') }}">Adicionar Pokémon</a> |
+            {% if session.get('id') %}
+                <span>Olá, {{ session.get('nome') }}</span> |
+                <a href="{{ url_for('logout') }}">Sair</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a> |
+                <a href="{{ url_for('cadastro') }}">Cadastrar</a>
+            {% endif %}
+        </nav>
+        <hr>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                {% for categoria, mensagem in messages %}
+                    <li>{{ mensagem }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <hr>
+        <p>© PokeAgenda</p>
+    </footer>
+</body>
+</html>

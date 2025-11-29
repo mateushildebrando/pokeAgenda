@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Adicionar Pokémon{% endblock %}
+
+{% block content %}
+<h2>Adicionar Pokémon</h2>
+
+<form method="POST" action="{{ url_for('adicionar_pokemon') }}">
+    <label for="pokemon">Nome ou número da Pokédex:</label><br>
+    <input type="text" id="pokemon" name="pokemon" placeholder="Ex: Pikachu ou 025" required><br><br>
+
+    <button type="submit">Adicionar</button>
+</form>
+
+{% endblock %}

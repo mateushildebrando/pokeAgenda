@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Editar Perfil - PokeAgenda{% endblock %}
+
+{% block content %}
+<h2>Editar Perfil</h2>
+
+<form action="{{ url_for('editar_perfil', id=treinador.id) }}" method="POST">
+    <label>Nome:</label><br>
+    <input type="text" name="nome" value="{{ treinador.nome }}"><br><br>
+
+    <label>Email:</label><br>
+    <input type="email" name="email" value="{{ treinador.email }}"><br><br>
+
+    <label>CPF:</label><br>
+    <input type="text" name="cpf" value="{{ treinador.cpf }}"><br><br>
+
+    <label>Cidade:</label><br>
+    <input type="text" name="cidade" value="{{ treinador.cidade }}"><br><br>
+
+    <button type="submit">Salvar</button>
+</form>
+
+<p><a href="{{ url_for('perfil') }}">Voltar</a></p>
+{% endblock %}

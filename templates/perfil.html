@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Perfil - PokeAgenda{% endblock %}
+
+{% block content %}
+<h2>Perfil do Treinador</h2>
+
+{% if treinador %}
+    <img src="{{ treinador.foto }}" alt="Foto" width="120" height="120"><br>
+    <p><strong>Nome:</strong> {{ treinador.nome }}</p>
+    <p><strong>Email:</strong> {{ treinador.email }}</p>
+    <p><strong>CPF:</strong> {{ treinador.cpf }}</p>
+    <p><strong>Cidade:</strong> {{ treinador.cidade }}</p>
+
+    <a href="{{ url_for('editar_perfil', id=treinador.id) }}">Editar Perfil</a>
+{% else %}
+    <p>Treinador não encontrado.</p>
+{% endif %}
+
+<hr>
+<h3>Time (até 6)</h3>
+{% if time %}
+    <ul>
+    {% for p in time %}
+        <li>
+            <img src="{{ p.imagem_url }}" width="80" alt="{{ p.nome }}">
+            <strong>{{ p.nome }}</strong> ({{ p.numero_pokedex }}) — {{ p.tipo }}<br>
+            Alt: {{ p.altura }} — Peso: {{ p.peso }} — {{ p.habilidades }}<br>
+            
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Seu time está vazio.</p>
+{% endif %}
+
+<hr>
+<h3>Box</h3>
+{% if box %}
+    <ul>
+    {% for p in box %}
+        <li>
+            <img src="{{ p.imagem_url }}" width="80" alt="{{ p.nome }}">
+            <strong>{{ p.nome }}</strong> ({{ p.numero_pokedex }}) — {{ p.tipo }}<br>
+            Alt: {{ p.altura }} — Peso: {{ p.peso }} — {{ p.habilidades }}<br>
+           
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Box vazio.</p>
+{% endif %}
+{% endblock %}

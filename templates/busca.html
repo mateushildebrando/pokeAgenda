@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Buscar Pokémons - PokeAgenda{% endblock %}
+
+{% block content %}
+<h2>Buscar Pokémons</h2>
+
+<form action="{{ url_for('buscar_pokemon') }}" method="POST">
+    <label>Nome ou Nº da Pokédex:</label><br>
+    <input type="text" name="pokemon" placeholder="Ex: Pikachu ou 025"><br><br>
+    <button type="submit">Buscar</button>
+</form>
+{% endblock %}
