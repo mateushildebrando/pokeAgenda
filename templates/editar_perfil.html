@@ -4,7 +4,12 @@
 {% block content %}
 <h2>Editar Perfil</h2>
 
-<form action="{{ url_for('editar_perfil', id=treinador.id) }}" method="POST">
+<form action="{{ url_for('editar_perfil', id=treinador.id) }}" method="POST" enctype="multipart/form-data">
+
+    <label>Foto de Perfil:</label><br>
+    <input type="file" name="foto"><br><br>
+
+
     <label>Nome:</label><br>
     <input type="text" name="nome" value="{{ treinador.nome }}"><br><br>
 

@@ -1,15 +1,23 @@
 {% extends "base.html" %}
-
 {% block title %}Adicionar Pokémon{% endblock %}
 
 {% block content %}
 <h2>Adicionar Pokémon</h2>
 
-<form method="POST" action="{{ url_for('adicionar_pokemon') }}">
-    <label for="pokemon">Nome ou número da Pokédex:</label><br>
-    <input type="text" id="pokemon" name="pokemon" placeholder="Ex: Pikachu ou 025" required><br><br>
+<form action="{{ url_for('adicionar_pokemon') }}" method="POST">
+
+    <label>Escolha o Pokémon:</label><br>
+
+    <input list="pokemons" name="pokemon" placeholder="Ex: Pikachu ou 025" required>
+
+    <datalist id="pokemons">
+        {% for p in lista_pokemons %}
+        <option value="{{ p.nome }}">{{ p.numero_pokedex }} - {{ p.nome }}</option>
+        {% endfor %}
+    </datalist>
+
+    <br><br>
 
     <button type="submit">Adicionar</button>
 </form>
-
 {% endblock %}

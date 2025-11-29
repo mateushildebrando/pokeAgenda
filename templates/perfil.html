@@ -24,8 +24,9 @@
         <li>
             <img src="{{ p.imagem_url }}" width="80" alt="{{ p.nome }}">
             <strong>{{ p.nome }}</strong> ({{ p.numero_pokedex }}) — {{ p.tipo }}<br>
-            Alt: {{ p.altura }} — Peso: {{ p.peso }} — {{ p.habilidades }}<br>
-            
+            Alt: {{ p.altura }}dm — Peso: {{ p.peso }}kg — {{ p.habilidades }}<br>
+            <a href="{{ url_for('remover_pokemon', relacao_id=p.id) }}">Remover</a> |
+            <a href="{{ url_for('trocar_pokemon', relacao_id=p.id) }}">Trocar Pokémon</a>
         </li>
     {% endfor %}
     </ul>
@@ -41,8 +42,8 @@
         <li>
             <img src="{{ p.imagem_url }}" width="80" alt="{{ p.nome }}">
             <strong>{{ p.nome }}</strong> ({{ p.numero_pokedex }}) — {{ p.tipo }}<br>
-            Alt: {{ p.altura }} — Peso: {{ p.peso }} — {{ p.habilidades }}<br>
-           
+            Alt: {{ p.altura }}dm — Peso: {{ p.peso }}kg — {{ p.habilidades }}<br>
+            <a href="{{ url_for('remover_pokemon', relacao_id=p.id) }}">Remover</a> |
         </li>
     {% endfor %}
     </ul>

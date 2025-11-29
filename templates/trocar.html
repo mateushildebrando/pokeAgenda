@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Trocar Pokémon{% endblock %}
+
+{% block content %}
+<h2>Trocar Pokémon do Time</h2>
+
+<p>Você está trocando: <strong>{{ pokemon_atual.nome }}</strong></p>
+
+<form action="{{ url_for('trocar_pokemon_confirmar') }}" method="GET">
+    
+    <input type="hidden" name="time_id" value="{{ relacao_id }}">
+
+    <label>Escolha um Pokémon do seu box:</label>
+    <input list="box_list" name="box_nome" required>
+
+    <datalist id="box_list">
+        {% for p in box %}
+        <option value="{{ p.nome }}">{{ p.nome }}</option>
+        {% endfor %}
+    </datalist>
+
+    <br><br>
+    <button type="submit">Confirmar Troca</button>
+</form>
+
+{% endblock %}

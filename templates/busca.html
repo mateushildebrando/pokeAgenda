@@ -5,8 +5,18 @@
 <h2>Buscar Pokémons</h2>
 
 <form action="{{ url_for('buscar_pokemon') }}" method="POST">
+    
     <label>Nome ou Nº da Pokédex:</label><br>
-    <input type="text" name="pokemon" placeholder="Ex: Pikachu ou 025"><br><br>
+
+    <input type="text" name="pokemon" list="lista_pokemon" placeholder="..." autocomplete="off">
+
+    <datalist id="lista_pokemon">
+        {% for p in lista_pokemon %}
+            <option value="{{ p.nome }}">ID: {{ p.id }}</option>
+        {% endfor %}
+    </datalist>
+
+    <br><br>
     <button type="submit">Buscar</button>
 </form>
 {% endblock %}
