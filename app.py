@@ -12,9 +12,11 @@ def home():
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 #rota de cadastro, onde pede-se: nome, email, cpf, cidade e senha, a foto vai padrão e pode ser alterada futuramente
-
 def cadastro():
+    """ Rota para a página de cadastro de novos usuários. """
+    # Se o formulário for enviado (método POST).
     if request.method == 'POST':
+        # Coleta os dados do formulário.
         nome = request.form['nome']
         email = request.form['email']
         cpf = request.form['cpf']
@@ -22,21 +24,24 @@ def cadastro():
         cidade = request.form['cidade']
         senha_raw = request.form['senha_raw']
         senha = generate_password_hash(senha_raw)
-
+        
 #verifica se tudo foi preenchido
         if not all([nome, email, cpf, cidade, senha_raw]):
             flash("Todos os campos são obrigatórios!", "erro")
             return redirect(url_for('cadastro'))
 
+        # Conecta ao banco de dados.
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(buffered=True)
-#procura se o user já foi cadastrado
+        
+        #procura se o user já foi cadastrado
         cursor.execute("SELECT * FROM treinador WHERE email = %s OR cpf = %s", (email, cpf))
         if cursor.fetchone():
             flash("E-mail ou CPF já cadastrado.", "erro")
             cursor.close()
             conn.close()
             return redirect(url_for('cadastro'))
+        
 #se não foi cadastrado ainda cadastra agora   
         cursor.execute("""INSERT INTO treinador (nome, email, cpf, foto, cidade, senha)
                           VALUES (%s, %s, %s, %s, %s, %s)""", (nome, email, cpf, foto, cidade, senha))
@@ -51,53 +56,77 @@ def cadastro():
     return render_template('cadastro.html')
 
 @app.route('/login', methods=['GET', 'POST'])
-#função de login. Pede email e senha.
 def login():
+    """ Rota para a página de login do sistema. """
     if request.method == 'POST':
-        email = request.form['email'].strip()
-        senha_raw = request.form['senha_raw'].strip()
+        email = request.form['email']
+        senha_raw = request.form['senha_raw']
         
-#verifica se tudo foi preenchido
-        if not all([email, senha_raw]):
-            flash("Todos os campos são obrigatórios!", "erro")
-            return redirect(url_for('cadastro'))
-
         conn = mysql.connector.connect(**db_config)
+        # `dictionary=True` faz o cursor retornar os resultados como dicionários (útil para acessar colunas pelo nome).
         cursor = conn.cursor(dictionary=True, buffered=True)
-#procura no banco
+        
+        # Busca o usuário pelo nome de usuário fornecido.
         cursor.execute("SELECT * FROM treinador WHERE email = %s", (email,))
         treinador = cursor.fetchone()
         
         cursor.close()
         conn.close()
-#guarda os dados do user
+
+        # Verifica se o usuário existe e se a senha fornecida corresponde ao hash salvo no banco.
         if treinador and check_password_hash(treinador['senha'], senha_raw):
+            # Verifica se a conta não está desativada.
+                        
+            # Salva os dados do usuário na sessão para mantê-lo logado.
             session['id'] = treinador['id']
             session['nome'] = treinador['nome']
             session['email'] = treinador['email']
             session['cpf'] = treinador['cpf']
             session['foto'] = treinador['foto']
             session['cidade'] = treinador['cidade']
-#redireciona para a tela de perfil
-        if treinador:
+            session['senha'] = treinador['senha']
+            
+            # Redireciona para o perfil
             return redirect(url_for('perfil'))
-#caso não encontre, retorna erro       
+            
         else:
+            # Se o usuário não existir ou a senha estiver incorreta.
             flash("Usuário ou senha inválidos.", "erro")
             return redirect(url_for('login'))
             
     return render_template('login.html')
 
+
 @app.route('/perfil')
-#exibe as informações do treinador na tela
 def perfil():
+    # Verifica login
+    if not session.get("id"):
+        flash("Você precisa estar logado para acessar o perfil.", "erro")
+        return redirect(url_for("login"))
+
+    treinador_id = session["id"]
+
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM treinador")
+
+    cursor.execute("SELECT * FROM treinador WHERE id=%s", (treinador_id,))
     treinador = cursor.fetchone()
+
+    cursor.execute('SELECT p.nome, p.numero_pokedex, p.tipo, p.imagem_url, p.altura, p.peso, p.habilidades FROM treinador_pokemon tp JOIN pokemon p ON tp.pokemon_id = p.id JOIN treinador t ON tp.treinador_id = t.id WHERE tp.posicao = "time";')
+    time = cursor.fetchall()
+
+    cursor.execute('SELECT p.nome, p.numero_pokedex, p.tipo, p.imagem_url, p.altura, p.peso, p.habilidades FROM treinador_pokemon tp JOIN pokemon p ON tp.pokemon_id = p.id JOIN treinador t ON tp.treinador_id = t.id WHERE tp.posicao = "box";')
+    box = cursor.fetchall()
+
     cursor.close()
     conn.close()
-    return render_template('perfil.html', treinador=treinador)
+
+    if not treinador:
+        flash("Erro ao carregar dados do usuário.", "erro")
+        return redirect(url_for("login"))
+
+    return render_template('perfil.html', treinador=treinador, time=time, box=box)
+
 
 @app.route('/logout')
 #função básica de sair da conta, basicamente apaga a memória do session
@@ -106,114 +135,187 @@ def logout():
     flash("Você saiu da sua conta.", "sucesso")
     return redirect(url_for('login'))
 
-if __name__ == '__main__':
-    app.run(debug=True)
 
-@app.route('/perfil/editar/<int:id>', methods=['GET', 'POST'])
-#função para editar o user
+# -------------------------------------------------------------------
+# Editar perfil
+# -------------------------------------------------------------------
+@app.route('/perfil/editar/<int:id>', methods=['GET','POST'])
 def editar_perfil(id):
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
-#coleta e atualização dos dados
+
     if request.method == 'POST':
         nome = request.form['nome']
         email = request.form['email']
         cpf = request.form['cpf']
         cidade = request.form['cidade']
 
-        query = """
-            UPDATE treinador SET nome = %s, email = %s, cpf = %s, cidade = %s
-            WHERE id = %s
-        """
-        cursor.execute(query, (nome, email, cpf, cidade, id))
+        cursor.execute("""
+            UPDATE treinador 
+            SET nome=%s, email=%s, cpf=%s, cidade=%s
+            WHERE id=%s
+        """, (nome, email, cpf, cidade, id))
         conn.commit()
+
         cursor.close()
         conn.close()
-        flash("Perfil atualizado com sucesso!", "sucesso")
+        flash("Perfil atualizado!", "sucesso")
         return redirect(url_for('perfil'))
-#procurando o usuario no banco de dados
-    cursor.execute("SELECT * FROM treinador WHERE id = %s", (id,))
+
+    cursor.execute("SELECT * FROM treinador WHERE id=%s", (id,))
     treinador = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
     if not treinador:
         flash("Treinador não encontrado.", "erro")
         return redirect(url_for('perfil'))
-    
-    cursor.close()
-    conn.close()
+
     return render_template('editar_perfil.html', treinador=treinador)
 
-@app.route("/busca", methods=["GET", "POST"])
+
+# -------------------------------------------------------------------
+# Busca Pokémon
+# -------------------------------------------------------------------
+@app.route("/busca", methods=["GET","POST"])
 def buscar_pokemon():
-    conn = mysql.connector.connect(**db_config)
-    cursor = conn.cursor(dictionary=True)
-    
     if request.method == 'POST':
-        pokemon = request.form['pokemon']
-  
-        query = """
-            SELECT nome, tipo, imagem, altura, peso, habilidades
-            FROM pokemon 
-            WHERE nome LIKE %s 
-               OR numero_pokedex LIKE %s
-        """
-    
-        cursor.execute(query, (pokemon, pokemon))
-        resultados = cursor.fetchall()
+        termo = "%" + request.form['pokemon'] + "%"
+
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT * FROM pokemon
+            WHERE nome LIKE %s OR numero_pokedex LIKE %s
+        """, (termo, termo))
+
+        pokemons = cursor.fetchall()
         cursor.close()
         conn.close()
 
-        return render_template("resultados.html", pokemons=resultados)
-    
-    #return principal ainda não sei, pois provavelmente essa função será associada a uma barra de pesquisa, e não uma página separada
+        return render_template("resultados.html", pokemons=pokemons)
 
-@app.route("/adicionar_pokemon", methods=["POST"])
+    return render_template("busca.html")
+
+
+# -------------------------------------------------------------------
+# Adicionar Pokémon ao time/box
+# -------------------------------------------------------------------
+@app.route("/adicionar_pokemon", methods=["GET", "POST"])
 def adicionar_pokemon():
     treinador_id = session.get("id")
-    pokemon = request.form["pokemon"]
+
+    if not treinador_id:
+        flash("Você precisa estar logado para adicionar pokémons.", "erro")
+        return redirect(url_for("login"))
+
+    # GET → mostra formulário
+    if request.method == "GET":
+        return render_template("adicionar_pokemon.html")
+
+    # POST → processa formulário
+    pokemon = request.form["pokemon"].strip()
 
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
 
-    # Buscar ID do Pokémon
-    query = """
-        SELECT id 
-        FROM pokemon 
-        WHERE nome = %s OR numero_pokedex = %s
-    """
-    cursor.execute(query, (pokemon, pokemon))
+    cursor.execute("SELECT id FROM pokemon WHERE nome=%s OR numero_pokedex=%s",
+                   (pokemon, pokemon))
     resultado = cursor.fetchone()
 
     if not resultado:
-        flash("Pokémon não encontrado.")
-        return redirect(url_for("pagina_de_adicionar"))
+        flash("Pokémon não encontrado.", "erro")
+        cursor.close()
+        conn.close()
+        return redirect(url_for("adicionar_pokemon"))
 
     pokemon_id = resultado["id"]
 
-    # Checar quantos Pokémon há no time
-    query = """
-        SELECT COUNT(id) AS total 
+    cursor.execute("""
+        SELECT COUNT(*) AS total 
         FROM treinador_pokemon 
-        WHERE posicao = "time" AND treinador_id = %s
-    """
-    cursor.execute(query, (treinador_id,))
-    count = cursor.fetchone()["total"]
+        WHERE posicao='time' AND treinador_id=%s
+    """, (treinador_id,))
+    count = cursor.fetchone()['total']
 
-    # Inserção
-    if count < 6:
-        posicao = "time"
-        flash("Pokémon adicionado ao time!")
-    else:
-        posicao = "box"
-        flash("Time cheio, Pokémon enviado à box!")
+    posicao = "time" if count < 6 else "box"
+    msg = "Pokémon adicionado ao time!" if posicao == "time" else "Time cheio, enviado ao box!"
 
-    insert = """
+    cursor.execute("""
         INSERT INTO treinador_pokemon (treinador_id, pokemon_id, posicao)
         VALUES (%s, %s, %s)
-    """
-    cursor.execute(insert, (treinador_id, pokemon_id, posicao))
+    """, (treinador_id, pokemon_id, posicao))
     conn.commit()
 
     cursor.close()
     conn.close()
 
-    return redirect(url_for("pagina_que_exibe_os_pokemons"))
+    flash(msg, "sucesso")
+    return redirect(url_for("perfil"))
+
+
+
+# -------------------------------------------------------------------
+# Remover Pokémon
+# -------------------------------------------------------------------
+@app.route("/remover/<int:relacao_id>")
+def remover_pokemon(relacao_id):
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM treinador_pokemon WHERE id=%s", (relacao_id,))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    flash("Pokémon removido!", "sucesso")
+    return redirect(url_for("perfil"))
+
+
+# -------------------------------------------------------------------
+# Trocar Pokémon do time ↔ box
+# -------------------------------------------------------------------
+@app.route("/trocar/<int:relacao_id>")
+def trocar_pokemon(relacao_id):
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT posicao FROM treinador_pokemon WHERE id=%s", (relacao_id,))
+    rel = cursor.fetchone()
+
+    if not rel:
+        flash("Pokémon não encontrado.", "erro")
+        return redirect(url_for("perfil"))
+
+    nova = "box" if rel["posicao"] == "time" else "time"
+
+    # verificar limite do time
+    if nova == "time":
+        cursor.execute("""
+            SELECT COUNT(*) AS total
+            FROM treinador_pokemon
+            WHERE treinador_id=%s AND posicao='time'
+        """, (session['id'],))
+        count = cursor.fetchone()['total']
+        if count >= 6:
+            flash("Seu time já tem 6 pokémons!", "erro")
+            return redirect(url_for("perfil"))
+
+    cursor.execute("""
+        UPDATE treinador_pokemon SET posicao=%s WHERE id=%s
+    """, (nova, relacao_id))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    flash("Pokémon movido!", "sucesso")
+    return redirect(url_for("perfil"))
+
+
+# -------------------------------------------------------------------
+if __name__ == "__main__":
+    app.run(debug=True)
