@@ -1,4 +1,19 @@
-from config import *
+from flask import Flask, render_template, url_for, redirect, session, request, flash
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+import mysql.connector
+import os
+
+app = Flask(__name__)
+app.secret_key = 'gremio'
+
+db_config = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': '',
+    'database': 'pokebanco'
+}
+CAMINHO_FOTOS = "static/fotosperfil"
 
 @app.route('/')
 # rota inicial que redireciona o user para seu perfil ou para login.
@@ -112,10 +127,22 @@ def perfil():
     cursor.execute("SELECT * FROM treinador WHERE id=%s", (treinador_id,))
     treinador = cursor.fetchone()
 
-    cursor.execute('SELECT p.nome, p.numero_pokedex, p.tipo, p.imagem_url, p.altura, p.peso, p.habilidades FROM treinador_pokemon tp JOIN pokemon p ON tp.pokemon_id = p.id JOIN treinador t ON tp.treinador_id = t.id WHERE tp.posicao = "time";')
+    cursor.execute('''
+        SELECT p.nome, p.numero_pokedex, p.tipo, p.imagem_url, p.altura, p.peso, p.habilidades, tp.id
+        FROM treinador_pokemon tp
+        JOIN pokemon p ON tp.pokemon_id = p.id
+        WHERE tp.posicao = "time" AND tp.treinador_id = %s
+        ORDER BY nome ASC
+    ''', (treinador_id,))
     time = cursor.fetchall()
 
-    cursor.execute('SELECT p.nome, p.numero_pokedex, p.tipo, p.imagem_url, p.altura, p.peso, p.habilidades FROM treinador_pokemon tp JOIN pokemon p ON tp.pokemon_id = p.id JOIN treinador t ON tp.treinador_id = t.id WHERE tp.posicao = "box";')
+    cursor.execute('''
+        SELECT p.nome, p.numero_pokedex, p.tipo, p.imagem_url, p.altura, p.peso, p.habilidades, tp.id
+        FROM treinador_pokemon tp
+        JOIN pokemon p ON tp.pokemon_id = p.id
+        WHERE tp.posicao = "box" AND tp.treinador_id = %s
+        ORDER BY nome ASC
+    ''', (treinador_id,))
     box = cursor.fetchall()
 
     cursor.close()
@@ -149,12 +176,19 @@ def editar_perfil(id):
         email = request.form['email']
         cpf = request.form['cpf']
         cidade = request.form['cidade']
+        foto = request.files['foto']
 
+        if foto and foto.filename != '':
+            nome_arquivo = secure_filename(foto.filename)
+            caminho_foto = os.path.join(CAMINHO_FOTOS, nome_arquivo)
+            foto.save(caminho_foto)
+            url_foto = f'/static//fotosperfil/{nome_arquivo}'
+            
         cursor.execute("""
             UPDATE treinador 
-            SET nome=%s, email=%s, cpf=%s, cidade=%s
+            SET nome=%s, email=%s, cpf=%s, cidade=%s, foto=%s
             WHERE id=%s
-        """, (nome, email, cpf, cidade, id))
+        """, (nome, email, cpf, cidade, url_foto, id))
         conn.commit()
 
         cursor.close()
@@ -180,11 +214,16 @@ def editar_perfil(id):
 # -------------------------------------------------------------------
 @app.route("/busca", methods=["GET","POST"])
 def buscar_pokemon():
+
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+
+    # sempre carrega lista para o datalist
+    cursor.execute("SELECT id, nome FROM pokemon ORDER BY id")
+    lista_pokemon = cursor.fetchall()
+
     if request.method == 'POST':
         termo = "%" + request.form['pokemon'] + "%"
-
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
 
         cursor.execute("""
             SELECT * FROM pokemon
@@ -194,11 +233,11 @@ def buscar_pokemon():
         pokemons = cursor.fetchall()
         cursor.close()
         conn.close()
-
         return render_template("resultados.html", pokemons=pokemons)
 
-    return render_template("busca.html")
-
+    cursor.close()
+    conn.close()
+    return render_template("busca.html", lista_pokemon=lista_pokemon)
 
 # -------------------------------------------------------------------
 # Adicionar Pokémon ao time/box
@@ -213,7 +252,17 @@ def adicionar_pokemon():
 
     # GET → mostra formulário
     if request.method == "GET":
-        return render_template("adicionar_pokemon.html")
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT id, nome, numero_pokedex FROM pokemon ORDER BY numero_pokedex")
+        lista_pokemons = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return render_template("adicionar_pokemon.html", lista_pokemons=lista_pokemons)
+
 
     # POST → processa formulário
     pokemon = request.form["pokemon"].strip()
@@ -221,6 +270,7 @@ def adicionar_pokemon():
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
 
+    # verifica se o pokémon existe
     cursor.execute("SELECT id FROM pokemon WHERE nome=%s OR numero_pokedex=%s",
                    (pokemon, pokemon))
     resultado = cursor.fetchone()
@@ -233,6 +283,21 @@ def adicionar_pokemon():
 
     pokemon_id = resultado["id"]
 
+    # ❗ VERIFICAÇÃO – impedir duplicação
+    cursor.execute("""
+        SELECT id FROM treinador_pokemon
+        WHERE treinador_id=%s AND pokemon_id=%s
+    """, (treinador_id, pokemon_id))
+
+    ja_tem = cursor.fetchone()
+
+    if ja_tem:
+        flash("Você já possui esse Pokémon no seu time ou box!", "erro")
+        cursor.close()
+        conn.close()
+        return redirect(url_for("perfil"))
+
+    # conta o número no time
     cursor.execute("""
         SELECT COUNT(*) AS total 
         FROM treinador_pokemon 
@@ -241,8 +306,9 @@ def adicionar_pokemon():
     count = cursor.fetchone()['total']
 
     posicao = "time" if count < 6 else "box"
-    msg = "Pokémon adicionado ao time!" if posicao == "time" else "Time cheio, enviado ao box!"
+    msg = "Pokémon adicionado ao time!" if posicao == "time" else "Time cheio — enviado ao box!"
 
+    # insere
     cursor.execute("""
         INSERT INTO treinador_pokemon (treinador_id, pokemon_id, posicao)
         VALUES (%s, %s, %s)
@@ -262,11 +328,45 @@ def adicionar_pokemon():
 # -------------------------------------------------------------------
 @app.route("/remover/<int:relacao_id>")
 def remover_pokemon(relacao_id):
-    conn = mysql.connector.connect(**db_config)
-    cursor = conn.cursor()
 
+    treinador_id = session.get("id")
+
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+
+    # pega a posicao ANTES de deletar
+    cursor.execute("SELECT posicao FROM treinador_pokemon WHERE id=%s", (relacao_id,))
+    resultado_posicao = cursor.fetchone()
+
+    if not resultado_posicao:
+        flash("Pokémon não encontrado.", "erro")
+        return redirect(url_for("perfil"))
+
+    posicao = resultado_posicao["posicao"]
+
+    # remove o pokemon
     cursor.execute("DELETE FROM treinador_pokemon WHERE id=%s", (relacao_id,))
     conn.commit()
+
+    # Se era do time → promover o primeiro do box
+    if posicao == 'time':
+
+        cursor.execute("""
+            SELECT id 
+            FROM treinador_pokemon
+            WHERE posicao='box' AND treinador_id=%s
+            ORDER BY id ASC
+            LIMIT 1
+        """, (treinador_id,))
+        proximo = cursor.fetchone()
+
+        if proximo:
+            cursor.execute("""
+                UPDATE treinador_pokemon
+                SET posicao='time'
+                WHERE id=%s
+            """, (proximo["id"],))
+            conn.commit()
 
     cursor.close()
     conn.close()
@@ -274,47 +374,97 @@ def remover_pokemon(relacao_id):
     flash("Pokémon removido!", "sucesso")
     return redirect(url_for("perfil"))
 
-
 # -------------------------------------------------------------------
 # Trocar Pokémon do time ↔ box
 # -------------------------------------------------------------------
-@app.route("/trocar/<int:relacao_id>")
+@app.route('/trocar/<int:relacao_id>')
 def trocar_pokemon(relacao_id):
+
+    if not session.get("id"):
+        flash("Você precisa estar logado.", "erro")
+        return redirect(url_for("login"))
+
+    treinador_id = session["id"]
+
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT posicao FROM treinador_pokemon WHERE id=%s", (relacao_id,))
-    rel = cursor.fetchone()
+    # pegar info do pokemon atual do time
+    cursor.execute("""
+        SELECT p.nome, tp.id 
+        FROM treinador_pokemon tp 
+        JOIN pokemon p ON tp.pokemon_id = p.id
+        WHERE tp.id = %s
+    """, (relacao_id,))
+    pokemon_atual = cursor.fetchone()
 
-    if not rel:
-        flash("Pokémon não encontrado.", "erro")
+    # pegar box do usuário
+    cursor.execute("""
+        SELECT p.nome, tp.id 
+        FROM treinador_pokemon tp 
+        JOIN pokemon p ON tp.pokemon_id = p.id
+        WHERE tp.treinador_id = %s AND tp.posicao = 'box'
+    """, (treinador_id,))
+    box = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "trocar.html",
+        relacao_id=relacao_id,
+        pokemon_atual=pokemon_atual,
+        box=box
+    )
+
+@app.route('/trocar_confirmar')
+def trocar_pokemon_confirmar():
+
+    time_id = request.args.get("time_id")
+    box_nome = request.args.get("box_nome")
+
+    if not time_id or not box_nome:
+        flash("Seleção inválida.", "erro")
         return redirect(url_for("perfil"))
 
-    nova = "box" if rel["posicao"] == "time" else "time"
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
 
-    # verificar limite do time
-    if nova == "time":
-        cursor.execute("""
-            SELECT COUNT(*) AS total
-            FROM treinador_pokemon
-            WHERE treinador_id=%s AND posicao='time'
-        """, (session['id'],))
-        count = cursor.fetchone()['total']
-        if count >= 6:
-            flash("Seu time já tem 6 pokémons!", "erro")
-            return redirect(url_for("perfil"))
+    # pegar o id do pokemon selecionado no box
+    cursor.execute("SELECT id FROM pokemon WHERE nome=%s", (box_nome,))
+    resultado = cursor.fetchone()
 
+    if not resultado:
+        flash("Pokémon inválido.", "erro")
+        return redirect(url_for("perfil"))
+
+    box_pokemon_id = resultado["id"]
+
+    # pegar o id da relação treinador_pokemon correspondente ao Pokémon do box
     cursor.execute("""
-        UPDATE treinador_pokemon SET posicao=%s WHERE id=%s
-    """, (nova, relacao_id))
+        SELECT id FROM treinador_pokemon 
+        WHERE pokemon_id=%s LIMIT 1
+    """, (box_pokemon_id,))
+    
+    relacao_box = cursor.fetchone()
+
+    if not relacao_box:
+        flash("Esse Pokémon não está no seu box.", "erro")
+        return redirect(url_for("perfil"))
+
+    box_relacao_id = relacao_box["id"]
+
+    # trocar posições
+    cursor.execute("UPDATE treinador_pokemon SET posicao='box' WHERE id=%s", (time_id,))
+    cursor.execute("UPDATE treinador_pokemon SET posicao='time' WHERE id=%s", (box_relacao_id,))
+    
     conn.commit()
 
     cursor.close()
     conn.close()
 
-    flash("Pokémon movido!", "sucesso")
+    flash("Pokémons trocados com sucesso!", "sucesso")
     return redirect(url_for("perfil"))
-
 
 # -------------------------------------------------------------------
 if __name__ == "__main__":
