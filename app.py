@@ -199,6 +199,9 @@ def editar_perfil(id):
             foto.save(caminho_foto)
             url_foto = f'/static//fotosperfil/{nome_arquivo}'
 
+        else:
+            url_foto = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp'
+
         #Atualiza os dados do usuário no banco.   
         cursor.execute("""
             UPDATE treinador 
