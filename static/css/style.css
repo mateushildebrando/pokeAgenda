@@ -1,0 +1,750 @@
+/* -------- fonte -------- */
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&display=swap');
+
+
+/*-------------Reset básico-------------*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* -------- geral -------- */
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: "Comfortaa", sans-serif;
+}
+
+
+/*-------------Links (geral)-------------*/
+a {
+    color: #f7f5f7 !important; /* roxo vibrante */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #16b666 !important; /* vermelho neon */
+    text-decoration: underline;
+    
+}
+
+nav, a {
+    color: #16b666;
+}
+
+/* =============================================
+   NAVBAR / ROTAS
+============================================= */
+
+.navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between; /* LINKS à esquerda — usuário à direita */
+    align-items: center;
+    background-color: #111;
+    padding: 15px 25px;
+    border-bottom: 2px solid #16b666;
+}
+
+.nav-links a {
+    margin-right: 20px;
+    font-size: 18px;
+}
+
+.nav-user {
+    color: #16b666;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+
+/*-------------Título PokeAgenda-------------*/
+.logo-title {
+    font-size: 28px;
+    text-align: center;
+    margin-top: 15px;
+    color: #16b666;
+}
+
+
+/*-------------Título principal-------------*/
+h1 {
+    text-align: center;
+    margin: 20px 0;
+    color: #1641b6;
+    letter-spacing: 2px;
+}
+
+
+/*-------------Container padrão-------------*/
+.container {
+    width: 90%;
+    max-width: 600px;
+    margin: 30px auto;
+    background-color: #111; 
+    border: 2px solid #16b666;
+    padding: 25px;
+    border-radius: 10px;
+}
+
+
+/* =============================================
+   LOGIN / CADASTRO (AUTH)
+============================================= */
+
+.container-auth {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 60px;
+    padding-bottom: 80px;
+    
+}
+
+.auth-card {
+    width: 1000px;
+    height: 520px;
+    background: #111;
+    display: flex;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 40px #16b666;
+    background: linear-gradient(135deg, #32328a, #16b666);
+}
+
+.auth-side {
+    width: 50%;
+    padding: 60px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+/* -------- Lado esquerdo -------- */
+
+.left-side h2 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.left-side p {
+    margin-top: 10px;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+
+/* -------- Lado direito -------- */
+
+
+.right-side h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+
+/* =============================================
+   FORMULÁRIOS
+============================================= */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background-color: #000;
+    border-radius: 8px;
+    border: 2px solid #16b666;
+    color: #fff;
+    font-size: 0.95rem;
+    transition: 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #16b666;
+    outline: none;
+}
+
+
+/* =============================================
+   BOTÕES
+============================================= */
+.btn-auth,
+button {
+    padding: 12px 26px;
+    border-radius: 25px;
+    border: none;
+    background: #16b666;
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.btn-auth:hover,
+button:hover {
+    background: #32328a;
+}
+
+
+/* =============================================
+   LINKS DE LOGIN ↔ CADASTRO (CORRIGIDOS)
+============================================= */
+
+/* ⬇️ Correção: esses NÃO ficam vermelhos */
+.auth-switch {
+    color: white!important;
+    font-weight: bold;
+}
+
+.auth-switch:hover {
+    color: #16b666 !important; /* hover igual ao resto */
+}
+
+
+/* =============================================
+EXTRAS
+============================================= */
+
+.card-custom {
+    background-color: #111;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #222;
+    margin-bottom: 15px;
+}
+
+.card-custom img {
+    border-radius: 6px;
+}
+
+.center { text-align: center; }
+.bold { font-weight: bold; }
+
+.small-text {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.spacer { margin-top: 15px; }
+
+
+/* ===========================
+   CONTAINER PRINCIPAL
+=========================== */
+.profile-container {
+    max-width: 850px;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+/* TÍTULOS */
+.section-title {
+    color: #16b666;
+    margin: 35px 0 20px;
+    font-size: 26px;
+    letter-spacing: 1px;
+}
+
+/* ===========================
+   CARD DO TREINADOR
+=========================== */
+.trainer-card {
+    background-color: #111;
+    border: 2px solid #16b666;
+    border-radius: 12px;
+    text-align: center;
+    padding: 25px;
+    margin: 0 auto 40px auto;
+    box-shadow: 0 0 20px #16b66680;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.trainer-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 30px #16b666aa;
+}
+
+.trainer-photo {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 3px solid #16b666;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.btn-edit {
+    display: inline-block;
+    margin-top: 15px;
+    background-color: #16b666 !important;
+    color: white !important;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.btn-edit:hover {
+    background-color: #32328a !important;
+}
+
+/* ===========================
+   GRID DE POKÉMON (TIME + BOX)
+=========================== */
+.pokemon-row {
+    display: flex;
+    flex-wrap: wrap;        /* permite múltiplas linhas */
+    justify-content: flex-start; /* ou center se quiser centralizado */
+    gap: 20px;              /* espaçamento entre cards */
+    padding: 10px 0;
+}
+
+/* CARD DE CADA POKÉMON */
+.pokemon-card {
+    background-color: #111;
+    border: 2px solid #16b666;
+    border-radius: 12px;
+    width: 230px;           /* tamanho do card */
+    height: 450px;
+    text-align: center;
+    box-shadow: 0 0 10px #16b66660;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex-shrink: 0;         /* evita encolher */
+}
+
+.pokemon-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px #16b666aa;
+}
+
+/* IMAGEM */
+.poke-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+/* INFORMAÇÕES */
+.poke-info {
+    padding: 10px;
+    font-size: 14px;
+    color: #fff;
+}
+
+.poke-info h4 {
+    margin: 0 0 6px 0;
+    font-weight: bold;
+    color: #16b666;
+}
+
+.poke-info p {
+    margin: 3px 0;
+    font-size: 14px;
+}
+
+/* BOTÕES */
+.poke-btn {
+    display: inline-block;
+    background-color: #d62828;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.poke-btn:hover {
+    background-color: #a00;
+}
+
+/* ===========================
+   RESPONSIVIDADE
+=========================== */
+@media (max-width: 1200px) {
+    .pokemon-card {
+        width: 180px;
+        height: 260px;
+    }
+}
+
+@media (max-width: 768px) {
+    .pokemon-card {
+        width: 150px;
+        height: 220px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pokemon-card {
+        width: 120px;
+        height: 180px;
+    }
+}
+
+
+/* ===========================
+   CONTAINER DO FORMULÁRIO
+=========================== */
+/* ===========================
+   CONTAINER PRINCIPAL / FORMULÁRIOS
+=========================== */
+/* ===========================
+   CONTAINER PRINCIPAL
+=========================== */
+.form-container {
+    max-width: 1000px;        /* largura máxima */
+    margin: 30px auto;        /* centraliza horizontalmente */
+    padding: 30px 25px;
+    background-color: #111;
+    border-radius: 12px;
+    box-shadow: 0 0 20px #16b66680;
+    border: 2px solid #16b666;
+    color: #fff;
+
+    display: flex;            
+    flex-wrap: wrap;          /* permite múltiplas linhas */
+    justify-content: center;  /* centraliza os itens */
+    gap: 20px;                /* espaço entre os Pokémon ou formulários */
+}
+
+/* TÍTULO DO FORMULÁRIO */
+.form-container h2 {
+    width: 100%;              
+    text-align: center;
+    margin-bottom: 25px;
+    color: #16b666;
+}
+
+/* LABELS */
+.form-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    width: 100%;
+}
+
+/* INPUTS */
+.form-container input[type="text"],
+.form-container input[type="email"],
+.form-container input[type="file"],
+.form-container input[list],
+.form-container select {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #16b666;
+    background-color: #222;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.3s ease;
+}
+
+.form-container input:focus,
+.form-container select:focus {
+    border-color: #d62828;
+}
+
+/* BOTÕES */
+.form-container button,
+.form-container .btn-voltar {
+    width: 100%;
+    padding: 10px 0;
+    background-color: #16b666;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    margin-top: 15px;
+}
+
+.form-container button:hover,
+.form-container .btn-voltar:hover {
+    background-color: #32328a;
+}
+
+/* LINKS */
+.form-container a {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #16b666;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.form-container a:hover {
+    text-decoration: underline;
+}
+
+/* MENSAGENS DE ERRO/SUCESSO */
+.form-container .form-msg {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #d62828;
+}
+
+/* ===========================
+   GRID DE RESULTADOS DE POKÉMON
+=========================== */
+.form-container ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    list-style: none;
+    padding: 0;
+    width: 100%;
+}
+
+.form-container ul li {
+    background-color: #111;
+    border: 2px solid #16b666;
+    border-radius: 12px;
+    width: 200px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 0 15px #16b66680;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-container ul li:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px #16b666aa;
+}
+
+.form-container ul li img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.form-container ul li strong {
+    color: #16b666;
+}
+
+.form-container ul li button {
+    margin-top: 10px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background-color: #d62828;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.form-container ul li button:hover {
+    background-color: #a00;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+    .form-container ul li {
+        width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-container ul li {
+        width: 120px;
+    }
+}
+
+
+
+nav{
+    color: white;
+    text-align: center;
+}
+
+p{
+    color: white;
+    text-align: center;
+}
+
+
+
+
+/* Container principal */
+.result-container {
+    max-width: 850px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #111;
+    border: 2px solid #16b666;
+    border-radius: 12px;
+    box-shadow: 0 0 20px #16b66680;
+    color: #fff;
+}
+
+/* Título */
+.result-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #16b666;
+    font-size: 24px;
+}
+
+/* Grid dos Pokémon */
+.result-container .pokemon-row {
+    display: flex;
+    flex-wrap: wrap;          /* permite várias linhas */
+    justify-content: center;  /* centraliza os cards */
+    gap: 20px;                /* espaço entre cards */
+}
+
+/* Card de cada Pokémon */
+.result-container .pokemon-card {
+    background-color: #111;
+    border: 2px solid #16b666;
+    border-radius: 12px;
+    width: 230px;           /* tamanho do card */
+    height: 450px;
+    text-align: center;
+    box-shadow: 0 0 10px #16b66660;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex-shrink: 0;
+}
+
+.result-container .pokemon-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px #16b666aa;
+}
+
+/* Imagem do Pokémon */
+.result-container .poke-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+/* Informações do Pokémon */
+.result-container .poke-info {
+    padding: 10px;
+    font-size: 14px;
+    color: #fff;
+}
+
+.result-container .poke-info h4 {
+    margin: 0 0 6px 0;
+    font-weight: bold;
+    color: #16b666;
+}
+
+.result-container .poke-info p {
+    margin: 3px 0;
+    font-size: 14px;
+}
+
+/* Botões */
+.result-container .poke-btn {
+    display: inline-block;
+    background-color: #d62828;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.3s ease;
+    cursor: pointer;
+}
+
+.result-container .poke-btn:hover {
+    background-color: #a00;
+}
+
+/* Botão de voltar separado do flex dos itens */
+.form-container .btn-voltar,
+.result-container .btn-voltar {
+    display: block;            /* força ocupar toda a linha */
+    width: auto;               /* não precisa ocupar 100% se quiser centralizar */
+    max-width: 200px;          /* tamanho máximo */
+    margin: 30px auto 0 auto;  /* centraliza horizontalmente e dá espaço em cima */
+    padding: 10px 20px;
+    background-color: #16b666;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.form-container .btn-voltar:hover,
+.result-container .btn-voltar:hover {
+    background-color: #32328a;
+}
+
+
+.result-container a:hover {
+    text-decoration: underline;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+    .result-container .pokemon-card {
+        width: 180px;
+        height: 260px;
+    }
+}
+
+@media (max-width: 768px) {
+    .result-container .pokemon-card {
+        width: 150px;
+        height: 220px;
+    }
+}
+
+@media (max-width: 480px) {
+    .result-container .pokemon-card {
+        width: 120px;
+        height: 180px;
+    }
+}
+
+
