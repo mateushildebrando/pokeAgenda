@@ -1,26 +1,36 @@
 {% extends "base.html" %}
 {% block title %}Trocar Pokémon{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/form-style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+{% endblock %}
+
 {% block content %}
-<h2>Trocar Pokémon do Time</h2>
+<div class="form-container">
+    <h2>Trocar Pokémon do Time</h2>
 
-<p>Você está trocando: <strong>{{ pokemon_atual.nome }}</strong></p>
+    <p style="text-align:center; margin-bottom: 20px;">
+        Você está trocando: <strong>{{ pokemon_atual.nome }}</strong>
+    </p>
 
-<form action="{{ url_for('trocar_pokemon_confirmar') }}" method="GET">
-    
-    <input type="hidden" name="time_id" value="{{ relacao_id }}">
+    <form action="{{ url_for('trocar_pokemon_confirmar') }}" method="GET">
 
-    <label>Escolha um Pokémon do seu box:</label>
-    <input list="box_list" name="box_nome" required>
+        <input type="hidden" name="time_id" value="{{ relacao_id }}">
 
-    <datalist id="box_list">
-        {% for p in box %}
-        <option value="{{ p.nome }}">{{ p.nome }}</option>
-        {% endfor %}
-    </datalist>
+        <label>Escolha um Pokémon do seu box:</label>
+        <input list="box_list" name="box_nome" placeholder="Digite o nome do Pokémon" required>
 
-    <br><br>
-    <button type="submit">Confirmar Troca</button>
-</form>
+        <datalist id="box_list">
+            {% for p in box %}
+            <option value="{{ p.nome }}">{{ p.nome }}</option>
+            {% endfor %}
+        </datalist>
 
+        <button type="submit">Confirmar Troca</button>
+    </form>
+
+    <a href="{{ url_for('perfil') }}">Voltar</a>
+</div>
 {% endblock %}

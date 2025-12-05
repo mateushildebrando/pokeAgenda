@@ -1,18 +1,39 @@
 {% extends "base.html" %}
 {% block title %}Login - PokeAgenda{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+{% endblock %}
+
+
+
 {% block content %}
-<h2>Login</h2>
+<div class="container-auth">
+    <div class="auth-card">
+        
+        <!-- Lado esquerdo -->
+        <div class="auth-side left-side">
+            <h2>Olá, seja Bem-vindo!</h2>
+            <p>Entre com seus dados para acessar sua PokeAgenda.</p>
+            <a href="{{ url_for('cadastro') }}" class="btn-auth">Se Cadastre!</a>
+        </div>
 
-<form action="{{ url_for('login') }}" method="POST">
-    <label>Email:</label><br>
-    <input type="email" name="email" value=""><br><br>
+        <!-- Formulário de Login -->
+        <div class="auth-side right-side">
+            <h2>Faça login</h2>
 
-    <label>Senha:</label><br>
-    <input type="password" name="senha_raw"><br><br>
+            <form action="{{ url_for('login') }}" method="POST">
+                <input type="email" name="email" placeholder="Email">
+                <input type="password" name="senha_raw" placeholder="Password">
 
-    <button type="submit">Entrar</button>
-</form>
+                <button type="submit" class="btn-auth">Login</button>
+            </form>
 
-<p>Não tem conta? <a href="{{ url_for('cadastro') }}">Cadastrar</a></p>
+        </div>
+
+    </div>
+</div>
+
 {% endblock %}
